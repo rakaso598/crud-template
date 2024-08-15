@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD 게시판</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        .__layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+        }
+        .board-title {
+            display: flex;
+        }
+        .board-login {
+            display: flex;
+        }
+        .board-create-post {
+            display: flex;
+        }
+        .board-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .__blank {
+            width: 10px;
+            height: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="__layout">
+<div class="board-title"><h1>CRUD 게시판</h1></div>
+<div class="board-login">
+    <a href="/login" style="font-weight: bold;">다시 로그인하기</a>
+    <div style="width: 20px;"></div>
+    <a href="/api/members/me" style="font-weight: bold;">로그인 정보 보기</a>
+</div>
+<div class="__blank"></div>
+<div>
+    <div style="font-weight: bold;"># 게시판 규칙에 대하여...</div>
+    <div style="font-weight: bold;"># 로그인한 유저만 글 작성 가능합니다</div>
+    <div style="font-weight: bold;"># 자신의 게시물일 경우 수정 및 삭제 가능합니다</div>
+    <div class="__blank"></div>
+</div>
+<div class="board-create-post">
+    <div class="form-container">
+        <form id="post-form">
+            <input type="text" id="title" placeholder="Title" required>
+            <input type="text" id="content" placeholder="Content" required>
+            <button type="submit">Create Post</button>
+        </form>
+    </div>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Content</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="posts-table-body">
+    <!-- Posts will be inserted here -->
+    </tbody>
+</table>
+<div class="__blank"></div>
+<div class="board-footer">
+    <div>Made by github@rakaso598</div>
+    <div>Restful API</div>
+    <div>CRUD Board</div>
+    <div class="__blank"></div>
+</div>
+</div>
+
+<script>
+    async function fetchPosts() {
+        try {
+            const response = await fetch('http://localhost:8090/api/posts');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const posts = await response.json();
+            const tableBody = document.getElementById('posts-table-body');
+            tableBody.innerHTML = ''; // Clear existing rows
+            posts.forEach(post => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${post.id}</td>
+                    <td>${post.title}</td>
+                    <td>${post.content}</td>
+                    <td>
+                        <button onclick="deletePost(${post.id})">Delete</button>
+                        <button onclick="editPost(${post.id})">Edit</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    }
+
+    async function createPost(event) {
+        event.preventDefault();
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('content').value;
+
+        try {
+            const response = await fetch('http://localhost:8090/api/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title, content })
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            fetchPosts(); // Refresh the list of posts
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    }
+
+    async function deletePost(id) {
+        try {
+            const response = await fetch(`http://localhost:8090/api/posts/${id}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            fetchPosts(); // Refresh the list of posts
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    }
+
+    async function editPost(id) {
+        const title = prompt("새로운 제목을 입력하세요:");
+        const content = prompt("새로운 내용을 입력하세요:");
+
+        if (title && content) {
+            try {
+                const response = await fetch(`http://localhost:8090/api/posts/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, content })
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                fetchPosts(); // 게시물 목록을 새로 고침
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+            }
+        }
+    }
+
+    document.getElementById('post-form').addEventListener('submit', createPost);
+
+    // Fetch posts when the page loads
+    window.onload = fetchPosts;
+</script>
+</body>
+</html>

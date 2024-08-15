@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 또는 로그인</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f2f2f2;
+    }
+    .container {
+        text-align: center;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: #4285F4;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #357ae8;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>회원가입 또는 로그인하세요</h1>
+  <div style="font-weight:bold;"># 회원정보가 존재하지 않으면</div>
+  <div style="font-weight:bold;">계정선택 시 자동으로 '회원가입'됩니다</div>
+  <div style="height:20px;"></div>
+  <div style="font-weight:bold;"># 이미 회원이라면 '로그인'됩니다</div>
+  <div style="height:20px;"></div>
+  <button onclick="window.location.href='http://localhost:8090/oauth2/authorization/google'">Google로 회원가입 및 로그인하기</button>
+</div>
+</body>
+</html>
